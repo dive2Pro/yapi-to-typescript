@@ -1,7 +1,8 @@
 /// <reference types="node" />
-import { ParsedPath } from 'path';
-import { JSONSchema4 } from 'json-schema';
-import * as changeCase from 'change-case';
+import { ParsedPath } from "path";
+import { JSONSchema4 } from "json-schema";
+import * as changeCase from "change-case";
+import { initRequest } from "./request";
 /** 请求方式 */
 export declare enum Method {
     GET = "GET",
@@ -115,7 +116,7 @@ export declare type PropDefinition = {
     /** 是否必需 */
     required: boolean;
     /** 类型 */
-    type: JSONSchema4['type'];
+    type: JSONSchema4["type"];
     /** 注释 */
     comment: string;
 };
@@ -128,51 +129,46 @@ export declare enum InterfaceType {
     /** 响应 */
     Response = 1
 }
-/** 配置 */
-export interface Config {
+export interface ProjectConfig {
     /** 项目 url */
     projectUrl: string;
-    /** 登录信息 */
-    login: {
-        /** 登录方式：classical（普通登录）、ldap（LDAP） */
-        method?: 'classical' | 'ldap';
-        /** 登录邮箱 */
-        email: string;
-        /** 登录密码 */
-        password: string;
-    } | {
-        /** 登录方式：openapi（开放API，仅 YApi 版本大于等于 1.5.0 时可用） */
-        method: 'openapi';
-        /** 项目 token（进入项目的设置-->token配置获取） */
-        token: string;
-    };
-    /** 随请求发送的其他 cookie 字符串，比如：`a=1; b=2` */
-    extraCookies?: string;
-    /** 数据所在字段，不设置表示整体都是数据 */
+    id: string;
     dataKey?: string;
-    /** 生成的 ts 文件放在这里 */
+    path: string;
     targetFile: string;
-    /** 要处理的分类列表 */
     categories: {
-        /** 分类 id */
         [id: number]: {
-            /** 获取发起请求函数的名称 */
             getRequestFunctionName: (api: ExtendedApi) => string;
-            /** 获取 ts 接口的名称 */
             getInterfaceName: (api: ExtendedApi, interfaceType: InterfaceType) => string;
         };
     };
 }
+/** 配置 */
+export interface Config {
+    url: string;
+    /** 随请求发送的其他 cookie 字符串，比如：`a=1; b=2` */
+    extraCookies?: string;
+    /** 登录信息 */
+    login: {
+        /** 登录方式：classical（普通登录）、ldap（LDAP） */
+        method?: "classical" | "ldap";
+        /** 登录邮箱 */
+        email: string;
+        /** 登录密码 */
+        password: string;
+    };
+    project: [ProjectConfig];
+}
 /** 请求载荷 */
 export interface RequestPayload {
     /** 请求路径，即 yapi 中的不含基本路径的 `接口路径`，如：`/user/getInfo` */
-    path: Api['path'];
+    path: Api["path"];
     /** 请求方法，如：`GET`、`POST`、`PUT`、`DELETE` 等 */
-    method: Api['method'];
+    method: Api["method"];
     /** 请求主体类型，如：`form`、`json`、`text` 等 */
-    requestBodyType: Api['req_body_type'];
+    requestBodyType: Api["req_body_type"];
     /** 响应主体类型，如：`json`、`text` 等 */
-    responseBodyType: Api['res_body_type'];
+    responseBodyType: Api["res_body_type"];
     /** 请求数据，一般是一个对象，需根据不同的 `请求主体类型` 予以加工并发送 */
     data: any;
     /** 要发送的文件数据 */
@@ -187,3 +183,9 @@ export declare type ExtendedApi = Api & {
     parsedPath: ParsedPath;
     changeCase: typeof changeCase;
 };
+export declare type ApiResult<T = any> = {
+    errcode: number;
+    errmsg: string;
+    data: T;
+};
+export declare type RequestDefailt = ReturnType<typeof initRequest>;

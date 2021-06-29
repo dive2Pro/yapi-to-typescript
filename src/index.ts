@@ -95,7 +95,7 @@ export default async (config: Config): Promise<void> => {
                   extendedApi
                 )}(requestData${
                   /(\{\}|any)$/s.test(requestPayloadType) ? "?" : ""
-                }: ${requestDataInterfaceName}, option: Options): Promise<${responseDataInterfaceName}> {\n${[
+                }: ${requestDataInterfaceName} | Options, option?: Options): Promise<${responseDataInterfaceName}> {\n${[
                   `  const { data, fileData } = parseRequestData(requestData)`,
                   `  return request({`,
                   `    path: ${projectConfig.path} + '/${api.path}',`,
@@ -108,7 +108,7 @@ export default async (config: Config): Promise<void> => {
                   `    responseBodyType: '${api.res_body_type}',`,
                   `    data: data,`,
                   `    fileData: fileData`,
-                  `  } as any)`
+                  `  } as any, option)`
                 ].join("\n")}\n}`
               ].join("\n\n");
             })
@@ -136,7 +136,7 @@ export default async (config: Config): Promise<void> => {
         responseBodyType,
         data,
         fileData
-      }: RequestPayload): Promise<any> {
+      }: RequestPayload, option?: Options): Promise<any> {
         return new Promise((resolve, reject) => {
           // 是否含有文件数据
           const hasFileData = Object.keys(fileData).length > 0

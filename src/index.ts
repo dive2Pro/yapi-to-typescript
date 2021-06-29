@@ -51,68 +51,76 @@ export default async (config: Config): Promise<void> => {
       },
       {}
     );
-    const tsContent = (await Promise.all(
-      Object.keys(projectConfig.categories).map(async (categoryId: any) => {
-        const {
-          getRequestFunctionName,
-          getInterfaceName
-        } = projectConfig.categories[categoryId];
-        return Promise.all(
-          (categoryIdToApiList[categoryId] || []).map(async api => {
-            const extendedApi: ExtendedApi = {
-              ...api,
-              parsedPath: path.parse(api.path),
-              changeCase: changeCase
-            };
-            const requestDataInterfaceName = changeCase.pascalCase(
-              getInterfaceName(extendedApi, InterfaceType.Request)
-            );
-            const responseDataInterfaceName = changeCase.pascalCase(
-              getInterfaceName(extendedApi, InterfaceType.Response)
-            );
-            const requestPayloadType = (await generateRequestPayloadType(
-              api,
-              requestDataInterfaceName
-            )).trim();
-            const responsePayloadType = (await generateResponsePayloadType(
-              api,
-              responseDataInterfaceName,
-              projectConfig.dataKey
-            )).trim();
-            return [
-              `/**\n * **请求类型**：${api.title}\n */\n${requestPayloadType}`,
-              `/**\n * **响应类型**：${api.title}\n */\n${responsePayloadType}`,
-              `/**\n * ${
-                api.title
-              }\n */\nexport function ${getRequestFunctionName(
-                extendedApi
-              )}(requestData${
-                /(\{\}|any)$/s.test(requestPayloadType) ? "?" : ""
-              }: ${requestDataInterfaceName}): Promise<${responseDataInterfaceName}> {\n${[
-                `  const { data, fileData } = parseRequestData(requestData)`,
-                `  return request({`,
-                `    path: '${projectConfig.path}/${api.path}',`,
-                `    method: '${api.method}',`,
-                `    requestBodyType: '${
-                  api.method === Method.GET
-                    ? RequestBodyType.Query
-                    : api.req_body_type
-                }',`,
-                `    responseBodyType: '${api.res_body_type}',`,
-                `    data: data,`,
-                `    fileData: fileData`,
-                `  } as any)`
-              ].join("\n")}\n}`
-            ].join("\n\n");
-          })
-        );
-      })
-    ))
-      .reduce((res, arr) => {
-        res.push(...arr);
-        return res;
-      }, [])
-      .join("\n\n");
+    let tsContent = "";
+    if (projectConfig.categories === "all") {
+    } else {
+      const categories = projectConfig.categories;
+      tsContent = (await Promise.all(
+        Object.keys(categories).map(async (categoryId: any) => {
+          const { getRequestFunctionName, getInterfaceName } = categories[
+            categoryId
+          ];
+          return Promise.all(
+            (categoryIdToApiList[categoryId] || []).map(async api => {
+              const extendedApi: ExtendedApi = {
+                ...api,
+                parsedPath: path.parse(api.path),
+                changeCase: changeCase
+              };
+              const requestDataInterfaceName = changeCase.pascalCase(
+                getInterfaceName(extendedApi, InterfaceType.Request)
+              );
+              const responseDataInterfaceName = changeCase.pascalCase(
+                getInterfaceName(extendedApi, InterfaceType.Response)
+              );
+              const requestPayloadType = (await generateRequestPayloadType(
+                api,
+                requestDataInterfaceName
+              )).trim();
+              const responsePayloadType = (await generateResponsePayloadType(
+                api,
+                responseDataInterfaceName,
+                projectConfig.dataKey
+              )).trim();
+              return [
+                `/**\n * **请求类型**：${
+                  api.title
+                }\n */\n${requestPayloadType}`,
+                `/**\n * **响应类型**：${
+                  api.title
+                }\n */\n${responsePayloadType}`,
+                `/**\n * ${
+                  api.title
+                }\n */\nexport function ${getRequestFunctionName(
+                  extendedApi
+                )}(requestData${
+                  /(\{\}|any)$/s.test(requestPayloadType) ? "?" : ""
+                }: ${requestDataInterfaceName}, option: Options): Promise<${responseDataInterfaceName}> {\n${[
+                  `  const { data, fileData } = parseRequestData(requestData)`,
+                  `  return request({`,
+                  `    path: ${projectConfig.path} + '/${api.path}',`,
+                  `    method: '${api.method}',`,
+                  `    requestBodyType: '${
+                    api.method === Method.GET
+                      ? RequestBodyType.Query
+                      : api.req_body_type
+                  }',`,
+                  `    responseBodyType: '${api.res_body_type}',`,
+                  `    data: data,`,
+                  `    fileData: fileData`,
+                  `  } as any)`
+                ].join("\n")}\n}`
+              ].join("\n\n");
+            })
+          );
+        })
+      ))
+        .reduce((res, arr) => {
+          res.push(...arr);
+          return res;
+        }, [])
+        .join("\n\n");
+    }
     const targetFile = path.resolve(process.cwd(), projectConfig.targetFile);
     const requestFile = path.join(path.parse(targetFile).dir, "request.ts");
     if (!fs.existsSync(requestFile)) {

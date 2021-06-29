@@ -30,7 +30,7 @@ export declare function parseRequestData<RD extends {
     [K in keyof RD]: RD[K] extends FileData ? never : K;
 }[keyof RD], FDK extends {
     [K in keyof RD]: RD[K] extends FileData ? K : never;
-}[keyof RD]>(requestData: RD): {
+}[keyof RD]>(requestData?: RD): {
     data: {
         [K in DK]: RD[K];
     };

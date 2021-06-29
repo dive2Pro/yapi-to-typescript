@@ -149,17 +149,18 @@ export interface ProjectConfig {
   id: string;
   dataKey?: string;
   path: string; // request path
-
   targetFile: string;
-  categories: {
-    [id: number]: {
-      getRequestFunctionName: (api: ExtendedApi) => string;
-      getInterfaceName: (
-        api: ExtendedApi,
-        interfaceType: InterfaceType
-      ) => string;
-    };
-  };
+  categories:
+    | "all"
+    | {
+        [id: number]: {
+          getRequestFunctionName: (api: ExtendedApi) => string;
+          getInterfaceName: (
+            api: ExtendedApi,
+            interfaceType: InterfaceType
+          ) => string;
+        };
+      };
 }
 /** 配置 */
 export interface Config {

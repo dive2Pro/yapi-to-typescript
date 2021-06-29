@@ -136,7 +136,7 @@ export interface ProjectConfig {
     dataKey?: string;
     path: string;
     targetFile: string;
-    categories: {
+    categories: "all" | {
         [id: number]: {
             getRequestFunctionName: (api: ExtendedApi) => string;
             getInterfaceName: (api: ExtendedApi, interfaceType: InterfaceType) => string;

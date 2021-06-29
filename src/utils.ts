@@ -4,7 +4,7 @@ export class FileData<T = any> {
    *
    * @private
    */
-  private originalFileData: T
+  private originalFileData: T;
 
   /**
    * 文件数据辅助类，统一网页、小程序等平台的文件上传。
@@ -12,7 +12,7 @@ export class FileData<T = any> {
    * @param originalFileData 原始文件数据
    */
   public constructor(originalFileData: T) {
-    this.originalFileData = originalFileData
+    this.originalFileData = originalFileData;
   }
 
   /**
@@ -21,7 +21,7 @@ export class FileData<T = any> {
    * @returns 原始文件数据
    */
   public getOriginalFileData(): T {
-    return this.originalFileData
+    return this.originalFileData;
   }
 }
 
@@ -35,22 +35,26 @@ export function parseRequestData<
   RD extends { [key: string]: any },
   DK extends { [K in keyof RD]: RD[K] extends FileData ? never : K }[keyof RD],
   FDK extends { [K in keyof RD]: RD[K] extends FileData ? K : never }[keyof RD]
->(requestData: RD): {
-  data: { [K in DK]: RD[K] },
-  fileData: { [K in FDK]: RD[K] extends FileData<infer T> ? T : any },
+>(
+  requestData?: RD
+): {
+  data: { [K in DK]: RD[K] };
+  fileData: { [K in FDK]: RD[K] extends FileData<infer T> ? T : any };
 } {
   const result = {
     data: {} as any,
-    fileData: {} as any,
-  }
-  if (requestData != null && typeof requestData === 'object') {
+    fileData: {} as any
+  };
+  if (requestData != null && typeof requestData === "object") {
     Object.keys(requestData).forEach(key => {
       if (requestData[key] && requestData[key] instanceof FileData) {
-        result.fileData[key] = (requestData[key] as FileData).getOriginalFileData()
+        result.fileData[key] = (requestData[
+          key
+        ] as FileData).getOriginalFileData();
       } else {
-        result.data[key] = requestData[key]
+        result.data[key] = requestData[key];
       }
-    })
+    });
   }
-  return result
+  return result;
 }

@@ -10,6 +10,7 @@ export default async function fetchApiCollection(
     return throwError("无法解析 projectUrl，请检查是否有误。");
   }
   const [, baseUrl, projectId] = matches;
-  let apiCollection = await request.get(config.projectUrl);
+  const apiUrl = `${baseUrl}api/plugin/export?type=json&pid=${projectId}&status=all&isWiki=false`;
+  let apiCollection = await request.get(apiUrl);
   return apiCollection;
 }

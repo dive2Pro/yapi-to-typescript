@@ -98,7 +98,7 @@ export default async (config: Config): Promise<void> => {
                 }: Options<${requestDataInterfaceName}>): Promise<${responseDataInterfaceName}> {\n${[
                   // `  const { data, fileData } = parseRequestData(requestData)`,
                   `  return request({`,
-                  `    path: ${projectConfig.path} + '/${api.path}',`,
+                  `    path: ${projectConfig.path} + '${api.path}',`,
                   `    method: '${api.method}',`,
                   `    requestBodyType: '${
                     api.method === Method.GET
@@ -107,7 +107,7 @@ export default async (config: Config): Promise<void> => {
                   }',`,
                   `    responseBodyType: '${api.res_body_type}',`,
                   `    ...requestData`,
-                  `  } as any, option)`
+                  `  } as any)`
                 ].join("\n")}\n}`
               ].join("\n\n");
             })
@@ -153,7 +153,6 @@ export default async (config: Config): Promise<void> => {
       [
         `/* tslint:disable */\n/* eslint-disable */`,
         `import request from './request'`,
-        `// @ts-ignore\nimport { FileData, parseRequestData } from 'yapi-to-typescript/lib/utils'`,
         tsContent
       ].join("\n\n")
     );

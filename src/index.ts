@@ -95,8 +95,8 @@ export default async (config: Config): Promise<void> => {
                   extendedApi
                 )}(requestData${
                   /(\{\}|any)$/s.test(requestPayloadType) ? "?" : ""
-                }: ${requestDataInterfaceName} | Options, option?: Options): Promise<${responseDataInterfaceName}> {\n${[
-                  `  const { data, fileData } = parseRequestData(requestData)`,
+                }: Options<${requestDataInterfaceName}>): Promise<${responseDataInterfaceName}> {\n${[
+                  // `  const { data, fileData } = parseRequestData(requestData)`,
                   `  return request({`,
                   `    path: ${projectConfig.path} + '/${api.path}',`,
                   `    method: '${api.method}',`,
@@ -106,8 +106,7 @@ export default async (config: Config): Promise<void> => {
                       : api.req_body_type
                   }',`,
                   `    responseBodyType: '${api.res_body_type}',`,
-                  `    data: data,`,
-                  `    fileData: fileData`,
+                  `    ...requestData`,
                   `  } as any, option)`
                 ].join("\n")}\n}`
               ].join("\n\n");

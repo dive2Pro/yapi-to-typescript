@@ -16,7 +16,7 @@ export async function run(): Promise<void> {
     const pkg = require('../package.json')
     const configFile = `${process.cwd()}/ytt.config.ts`
 
-    cli
+    cli.createCommand('run')
       .version(pkg.version)
       .arguments('[cmd]')
       .action(cmd => {

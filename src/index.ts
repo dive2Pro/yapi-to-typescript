@@ -54,12 +54,12 @@ export default async (config: Config): Promise<void> => {
     let tsContent = "";
     let categories: number[] = [];
     if (projectConfig.categories === "all") {
-      categories = apiCollection.map(apiItem => apiItem.index);
+      categories = apiCollection.map(apiItem => apiItem.list[0].catid);
     } else {
       categories = projectConfig.categories;
     }
     tsContent = (await Promise.all(
-      Object.keys(categories).map(async (categoryId: any) => {
+      categories.map(async categoryId => {
         return Promise.all(
           (categoryIdToApiList[categoryId] || []).map(async api => {
             const extendedApi: ExtendedApi = {

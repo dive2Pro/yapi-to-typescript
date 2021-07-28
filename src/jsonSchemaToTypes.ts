@@ -1,5 +1,5 @@
 import { compile, Options } from "json-schema-to-typescript";
-import { JSONSchema4 } from "json-schema";
+import { JSONSchema4 } from 'json-schema';
 import { isEmpty, castArray } from "vtils";
 
 const JSTTOptions: Partial<Options> = {
@@ -24,13 +24,18 @@ const normalizeSchema = (schema: JSONSchema4): JSONSchema4 => {
   delete schema.title;
   delete schema.id;
   schema.additionalProperties = false;
+  schema.ignoreMinAndMaxItems = true;
   if (schema.properties) {
     Object.values(schema.properties).forEach(item => {
       normalizeSchema(item);
     });
+    if (!schema.required) {
+      schema.required = Object.keys(schema.properties);
+    }
   }
   if (schema.items) {
     schema.required = castArray(schema.items).map(item => item.title as string);
+    console.log(schema);
     castArray(schema.items).forEach(item => {
       normalizeSchema(item);
     });
@@ -45,5 +50,6 @@ export default async function jsonSchemaToTypes(
   if (isEmpty(schema)) {
     return `export type ${interfaceName} = any`;
   }
-  return compile(normalizeSchema(schema), interfaceName, JSTTOptions);
+  const s = normalizeSchema(schema);
+  return compile(s, interfaceName, JSTTOptions);
 }

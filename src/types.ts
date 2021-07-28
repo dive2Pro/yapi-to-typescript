@@ -118,8 +118,6 @@ export type ApiCollection = Array<{
   desc: string;
   /** 分类接口列表 */
   list: ApiList;
-  /** 分类 id */
-  index: number;
 }>;
 
 /** 属性定义 */
@@ -152,7 +150,7 @@ export interface ProjectConfig {
   dataKey?: string;
   path: string; // request path
   targetFile: string;
-  categories: "all" | [number];
+  categories: "all" | number[];
   getRequestFunctionName: (api: ExtendedApi) => string;
   getInterfaceName: (api: ExtendedApi, interfaceType: InterfaceType) => string;
 }

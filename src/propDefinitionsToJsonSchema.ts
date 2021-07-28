@@ -25,7 +25,7 @@ export default function propDefinitionsToJsonSchema(propDefinitions: PropDefinit
           type: prop.type,
           description: prop.comment,
           // 特殊处理 file
-          ...(prop.type === 'file' ? { tsType: 'FileData' } : {}),
+          // ...(prop.type === 'file' ? : {}),
         }
         return res
       },
